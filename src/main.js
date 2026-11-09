@@ -224,3 +224,12 @@ $('t-new').click();
 
 $('q-run').click(); // бастапқы демо: 8 ферзь
 showTab(location.hash.slice(1));
+
+// ?demo — скриншот/қорғау үшін дайын күй (лабиринт + салыстыру, TTT бірінші жүріс)
+if (new URLSearchParams(location.search).has('demo')) {
+  for (let r = 0; r <= 10; r++) S.cells[r][8] = 0;
+  for (let r = 4; r <= 14; r++) S.cells[r][16] = 0;
+  for (let r = 11; r <= 13; r++) for (let c = 9; c <= 11; c++) S.cells[r][c] = 5;
+  sDraw(); $('s-compare').click();
+  tHuman(4);
+}

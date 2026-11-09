@@ -18,13 +18,13 @@ QAIRU AI Application Development Challenge 2026 (Final Project). Интерак�
 ## Іске қосу
 Тәуелділіктер жоқ (таза JavaScript, ES modules).
 ```bash
-git clone https://github.com/<user>/TwoThirteen.git
+git clone https://github.com/GGRANOX/TwoThirteen.git
 cd TwoThirteen
 npx serve .        # немесе: python -m http.server 8000
 ```
 Браузерде `http://localhost:3000` (немесе `:8000`) ашыңыз. `index.html`-ді файл ретінде ашу модульдер үшін жұмыс істемейді — сервер қажет.
 
-Live demo: `https://<user>.github.io/TwoThirteen/`
+Live demo: https://twothirteen.vercel.app (дайын күйлер: `/?demo#search`, `#queens`, `#ttt`)
 
 ## Тестілеу
 Node.js ≥ 20:
@@ -54,7 +54,7 @@ docs/                # Technical Report, AI Usage Declaration, Team Contribution
 - Құпия API кілттері жоқ және қажет емес.
 
 ## Құжаттама
-`docs/technical-report.md`, `docs/ai-usage-declaration.md`, `docs/team-contribution.md`, `docs/presentation-outline.md`.
+`docs/technical-report.md` (нақты өлшеулермен, `npm run bench`), `docs/ai-usage-declaration.md`, `docs/team-contribution.md`, `docs/presentation-outline.md`, презентация: `docs/TwoThirteen-presentation.pptx`.
 
 ## Әзірлеушілер
-Насим, Улсан
+Irgebay Ulsana, Abdul Gani Nassima

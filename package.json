@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
+    "bench": "node scripts/benchmark.mjs",
     "start": "npx serve ."
   }
 }
