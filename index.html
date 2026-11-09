@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TwoThirteen — AI алгоритм визуализаторы</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <h1>TwoThirteen</h1>
+  <p>AI алгоритм визуализаторы · QAIRU Final Project 2026</p>
+  <nav role="tablist">
+    <button role="tab" data-tab="search" class="active">Апта 2 · Іздеу (A*)</button>
+    <button role="tab" data-tab="queens">Апта 3 · Hill Climbing</button>
+    <button role="tab" data-tab="ttt">Апта 4 · Minimax</button>
+  </nav>
+</header>
+
+<main>
+<!-- ===== Апта 2 ===== -->
+<section id="tab-search" class="panel">
+  <div class="controls">
+    <label>Жол саны <input id="s-rows" type="number" value="15" min="2" max="60"></label>
+    <label>Баған саны <input id="s-cols" type="number" value="25" min="2" max="60"></label>
+    <button id="s-resize">Торды жасау</button>
+    <label>Алгоритм
+      <select id="s-algo">
+        <option value="astar">A*</option><option value="ucs">UCS</option>
+        <option value="bfs">BFS</option><option value="dfs">DFS</option>
+      </select></label>
+    <label>Эвристика
+      <select id="s-heur"><option value="manhattan">Manhattan</option><option value="euclidean">Euclidean</option><option value="zero">h=0</option></select></label>
+    <label>Сурет салу
+      <select id="s-mode">
+        <option value="wall">Қабырға</option><option value="w5">Салмақ 5</option><option value="w9">Салмақ 9</option>
+        <option value="start">Бастау</option><option value="goal">Аяқтау</option><option value="erase">Өшіргіш</option>
+      </select></label>
+    <label>Жылдамдық <input id="s-speed" type="range" min="1" max="100" value="60"></label>
+  </div>
+  <div class="controls">
+    <button id="s-run" class="primary">Іске қосу</button>
+    <button id="s-compare">Барлығын салыстыру</button>
+    <button id="s-random">Кездейсоқ қабырғалар</button>
+    <button id="s-clear">Тазалау</button>
+  </div>
+  <div id="s-msg" class="msg" role="status"></div>
+  <canvas id="s-canvas"></canvas>
+  <p class="legend"><i class="c-start"></i>бастау <i class="c-goal"></i>аяқтау <i class="c-wall"></i>қабырға <i class="c-vis"></i>ашылған <i class="c-path"></i>жол · торды тышқанмен бояңыз</p>
+  <div id="s-result"></div>
+  <div class="explain" id="s-explain"></div>
+</section>
+
+<!-- ===== Апта 3 ===== -->
+<section id="tab-queens" class="panel" hidden>
+  <div class="controls">
+    <label>N (4–30) <input id="q-n" type="number" value="8" min="4" max="30"></label>
+    <label>Restarts <input id="q-restarts" type="number" value="20" min="0" max="1000"></label>
+    <label>Seed <input id="q-seed" type="number" value="1" min="0"></label>
+    <button id="q-run" class="primary">Іске қосу</button>
+    <button id="q-play">▶ Ойнату</button>
+  </div>
+  <div id="q-msg" class="msg" role="status"></div>
+  <input id="q-slider" type="range" min="0" max="0" value="0" aria-label="Қадам">
+  <canvas id="q-canvas"></canvas>
+  <div id="q-info" class="explain"></div>
+</section>
+
+<!-- ===== Апта 4 ===== -->
+<section id="tab-ttt" class="panel" hidden>
+  <div class="controls">
+    <label>AI алгоритмі
+      <select id="t-algo"><option value="alphabeta">Alpha-Beta</option><option value="minimax">Minimax</option></select></label>
+    <label>Кім бірінші
+      <select id="t-first"><option value="human">Адам (X)</option><option value="ai">AI (O)</option></select></label>
+    <button id="t-new" class="primary">Жаңа ойын</button>
+  </div>
+  <div id="t-msg" class="msg" role="status"></div>
+  <div id="t-board" class="ttt" role="grid"></div>
+  <div id="t-info" class="explain"></div>
+</section>
+</main>
+
+<footer>Барлық алгоритмдер қолмен жазылған (дайын AI API жоқ). Код: <code>src/</code></footer>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
