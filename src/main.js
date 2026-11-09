@@ -17,21 +17,44 @@ const S = { cells: makeGrid(15, 25), start: [7, 3], goal: [7, 21], vis: new Map(
 const sc = $('s-canvas'), sctx = sc.getContext('2d');
 const CELL = 26;
 
+// ---------- UI helpers: segmented controls & iOS sliders ----------
+document.querySelectorAll('.seg').forEach((seg) => seg.addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  seg.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+  $(seg.dataset.for).value = b.dataset.v;
+}));
+function syncSlider(inp) {
+  const p = ((inp.value - inp.min) / (inp.max - inp.min)) * 100;
+  inp.style.setProperty('--p', p + '%');
+  const out = inp.closest('label')?.querySelector('output'); if (out) out.textContent = inp.value;
+}
+document.querySelectorAll('input[type=range]').forEach((r) => { syncSlider(r); r.addEventListener('input', () => syncSlider(r)); });
+
+const rr = (ctx, x, y, w, h, r) => { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); };
+
 function sDraw() {
   const R = S.cells.length, C = S.cells[0].length;
   sc.width = C * CELL; sc.height = R * CELL;
+  sctx.fillStyle = '#fff8fa'; sctx.fillRect(0, 0, sc.width, sc.height);
+  const pad = 1.5;
   for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
-    const w = S.cells[r][c], x = c * CELL, y = r * CELL;
-    sctx.fillStyle = w === 0 ? '#2d333b' : S.vis.has(r * C + c) ? '#9ecbff' : w > 1 ? `hsl(30 70% ${88 - w * 3}%)` : '#fff';
-    sctx.fillRect(x, y, CELL, CELL);
-    sctx.strokeStyle = '#d0d7de'; sctx.strokeRect(x + .5, y + .5, CELL, CELL);
-    if (w > 1) { sctx.fillStyle = '#7a4a00'; sctx.font = '11px sans-serif'; sctx.fillText(w, x + 9, y + 17); }
+    const w = S.cells[r][c], x = c * CELL + pad, y = r * CELL + pad, s = CELL - pad * 2;
+    sctx.fillStyle = w === 0 ? '#6e4a5c' : S.vis.has(r * C + c) ? '#f6cfdc' : w > 1 ? `hsl(280 ${28 + w * 2}% ${94 - w * 2.2}%)` : '#fdeef2';
+    rr(sctx, x, y, s, s, 7); sctx.fill();
+    if (w > 1) { sctx.fillStyle = '#7d5b95'; sctx.font = '600 11px -apple-system, Segoe UI, sans-serif'; sctx.textAlign = 'center'; sctx.textBaseline = 'middle'; sctx.fillText(w, x + s / 2, y + s / 2 + 1); }
   }
-  sctx.fillStyle = '#f2cc60';
-  S.path.forEach(([r, c]) => sctx.fillRect(c * CELL + 6, r * CELL + 6, CELL - 12, CELL - 12));
-  for (const [p, col] of [[S.start, '#2ea043'], [S.goal, '#e5534b']]) {
-    sctx.fillStyle = col; sctx.beginPath();
-    sctx.arc(p[1] * CELL + CELL / 2, p[0] * CELL + CELL / 2, CELL / 2 - 3, 0, 7); sctx.fill();
+  if (S.path.length > 1) {
+    sctx.strokeStyle = '#b9496d'; sctx.lineWidth = CELL * 0.3; sctx.lineCap = sctx.lineJoin = 'round';
+    sctx.shadowColor = 'rgba(185,73,109,.45)'; sctx.shadowBlur = 8;
+    sctx.beginPath();
+    S.path.forEach(([r, c], i) => sctx[i ? 'lineTo' : 'moveTo'](c * CELL + CELL / 2, r * CELL + CELL / 2));
+    sctx.stroke(); sctx.shadowBlur = 0;
+  }
+  for (const [p, col] of [[S.start, '#6fb99d'], [S.goal, '#b9496d']]) {
+    const cx = p[1] * CELL + CELL / 2, cy = p[0] * CELL + CELL / 2;
+    sctx.fillStyle = '#fff'; sctx.shadowColor = 'rgba(70,30,50,.3)'; sctx.shadowBlur = 6;
+    sctx.beginPath(); sctx.arc(cx, cy, CELL / 2 - 2, 0, 7); sctx.fill(); sctx.shadowBlur = 0;
+    sctx.fillStyle = col; sctx.beginPath(); sctx.arc(cx, cy, CELL / 2 - 6, 0, 7); sctx.fill();
   }
 }
 
@@ -116,17 +139,19 @@ function qDraw() {
   const n = step ? step.state.length : +$('q-n').value || 8, size = Math.min(520, n * 40), cs = size / n;
   qc.width = qc.height = size;
   for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
-    qctx.fillStyle = (r + c) % 2 ? '#b58863' : '#f0d9b5'; qctx.fillRect(c * cs, r * cs, cs, cs);
+    qctx.fillStyle = (r + c) % 2 ? '#ecbccb' : '#fdf0f4'; qctx.fillRect(c * cs, r * cs, cs, cs);
   }
   if (!step) return;
-  qctx.font = `${cs * 0.7}px serif`; qctx.textAlign = 'center'; qctx.textBaseline = 'middle';
+  const crown = new Path2D('M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5L3 8z');
   step.state.forEach((row, c) => {
     const attacked = step.state.some((r2, c2) => c2 !== c && (r2 === row || Math.abs(r2 - row) === Math.abs(c2 - c)));
-    qctx.fillStyle = attacked ? '#c0392b' : '#1e8449';
-    qctx.fillText('♛', c * cs + cs / 2, row * cs + cs / 2 + 2);
+    qctx.save();
+    qctx.translate(c * cs + cs * 0.15, row * cs + cs * 0.15); qctx.scale((cs * 0.7) / 24, (cs * 0.7) / 24);
+    qctx.fillStyle = attacked ? '#d64566' : '#7b5aa6'; qctx.shadowColor = 'rgba(60,20,50,.3)'; qctx.shadowBlur = 4;
+    qctx.fill(crown); qctx.restore();
   });
   $('q-info').innerHTML = `<b>Қадам ${Q.i}/${Q.res.steps.length - 1}</b> · restart #${step.restart} · конфликттер h = <b>${step.h}</b>` +
-    (Q.i === Q.res.steps.length - 1 ? (Q.res.solved ? ' · <b>шешім табылды ✔</b>' : ' · шешім табылмады (жергілікті минимум)') : '') +
+    (Q.i === Q.res.steps.length - 1 ? (Q.res.solved ? ' · <b>шешім табылды</b>' : ' · шешім табылмады (жергілікті минимум)') : '') +
     '<br>Hill Climbing әр қадамда h-ты ең көп азайтатын ферзь жылжытады; жергілікті минимумда тоқтап, кездейсоқ қайта бастайды (random restart).';
 }
 $('q-run').onclick = () => {
@@ -134,18 +159,18 @@ $('q-run').onclick = () => {
   try {
     Q.res = hillClimbing(+$('q-n').value, { maxRestarts: +$('q-restarts').value, seed: +$('q-seed').value });
   } catch (e) { say($('q-msg'), e.message, 'err'); return; }
-  Q.i = 0; $('q-slider').max = Q.res.steps.length - 1; $('q-slider').value = 0;
+  Q.i = 0; $('q-slider').max = Q.res.steps.length - 1; $('q-slider').value = 0; syncSlider($('q-slider'));
   say($('q-msg'), Q.res.solved ? `Шешім табылды: ${Q.res.restarts} restart, ${Q.res.steps.length - 1} қадам.` : `Шешім табылмады, соңғы h=${Q.res.h}. Restarts санын көбейтіңіз.`, Q.res.solved ? 'ok' : 'err');
   qDraw();
 };
-$('q-slider').oninput = (e) => { Q.i = +e.target.value; qDraw(); };
+$('q-slider').addEventListener('input', (e) => { Q.i = +e.target.value; qDraw(); });
 $('q-play').onclick = () => {
   if (!Q.res) { say($('q-msg'), 'Алдымен «Іске қосу» басыңыз.', 'err'); return; }
   clearInterval(Q.timer);
   if (Q.i >= Q.res.steps.length - 1) Q.i = 0;
   Q.timer = setInterval(() => {
     if (Q.i >= Q.res.steps.length - 1) { clearInterval(Q.timer); return; }
-    Q.i++; $('q-slider').value = Q.i; qDraw();
+    Q.i++; $('q-slider').value = Q.i; syncSlider($('q-slider')); qDraw();
   }, 250);
 };
 qDraw();
@@ -156,7 +181,7 @@ function tRender() {
   const box = $('t-board'); box.innerHTML = '';
   T.b.forEach((v, i) => {
     const btn = document.createElement('button');
-    btn.textContent = v || ''; btn.disabled = !!v || T.over;
+    btn.innerHTML = v === 'X' ? '<svg class="x" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg>' : v === 'O' ? '<svg class="o" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/></svg>' : ''; btn.disabled = !!v || T.over;
     btn.setAttribute('aria-label', `Ұяшық ${i + 1}`);
     btn.onclick = () => tHuman(i); box.appendChild(btn);
   });
