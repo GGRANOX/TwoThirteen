@@ -6,10 +6,15 @@ const $ = (id) => document.getElementById(id);
 const say = (el, text, kind = '') => { el.textContent = text; el.className = 'msg ' + kind; };
 const NAMES = { astar: 'A*', ucs: 'UCS', bfs: 'BFS', dfs: 'DFS' };
 
-// ---------- Tabs ----------
+// ---------- Tabs (deep links: #search, #queens, #ttt) ----------
+function showTab(name) {
+  const tabs = document.querySelectorAll('nav button');
+  if (![...tabs].some((b) => b.dataset.tab === name)) name = 'search';
+  tabs.forEach((x) => x.classList.toggle('active', x.dataset.tab === name));
+  document.querySelectorAll('.panel').forEach((p) => { p.hidden = p.id !== 'tab-' + name; });
+}
 document.querySelectorAll('nav button').forEach((b) => b.addEventListener('click', () => {
-  document.querySelectorAll('nav button').forEach((x) => x.classList.toggle('active', x === b));
-  document.querySelectorAll('.panel').forEach((p) => { p.hidden = p.id !== 'tab-' + b.dataset.tab; });
+  showTab(b.dataset.tab); history.replaceState(null, '', '#' + b.dataset.tab);
 }));
 
 // ======================= Апта 2: Search =======================
@@ -216,3 +221,6 @@ $('t-new').onclick = () => {
   tRender();
 };
 $('t-new').click();
+
+$('q-run').click(); // бастапқы демо: 8 ферзь
+showTab(location.hash.slice(1));
