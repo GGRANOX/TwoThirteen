@@ -55,3 +55,6 @@ docs/                # Technical Report, AI Usage Declaration, Team Contribution
 
 ## Құжаттама
 `docs/technical-report.md`, `docs/ai-usage-declaration.md`, `docs/team-contribution.md`, `docs/presentation-outline.md`.
+
+## Әзірлеушілер
+Улсан, Насим
